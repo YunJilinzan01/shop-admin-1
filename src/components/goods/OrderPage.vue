@@ -1,7 +1,7 @@
 <script setup>
 // 引入模拟数据模块，用于生成假订单数据
 import { requestOrderList, delOrderItem } from '@/api/request'
-import Mock from '@/mock/Mock'
+
 // 引入工具方法模块，包含导出等功能
 import Tools from '@/stores/Tools'
 import formatDate from '@/Tool/date'
@@ -9,11 +9,6 @@ import formatDate from '@/Tool/date'
 import { ElMessage } from 'element-plus'
 // 引入 Vue 的响应式和生命周期相关方法
 import { onMounted, ref } from 'vue'
-// 引入 vue-router 的路由相关方法
-import { useRoute } from 'vue-router'
-
-// 获取当前路由对象
-const route = useRoute()
 
 // 表格组件的引用，用于操作表格
 const multipeTable = ref(null)
@@ -107,14 +102,6 @@ const clear = async () => {
 
 const exportData = () => {
   Tools.exporJson(`订单.json${JSON.stringify(orderList.value)}`)
-}
-
-const dispatchGoods = () => {
-  ElMessage({
-    type: 'success',
-    message: `发货商品${JSON.stringify(multpleSelection.value)}`,
-  })
-  orderList.value = Mock.getOrder(route.query.type)
 }
 
 const exportDispatchGoods = () => {
@@ -215,8 +202,7 @@ const callUser = (item) => {
           <el-button type="danger" @click="clear">清除筛选</el-button>
           <!-- 点击导出按钮，调用 exportData 方法 -->
           <el-button type="primary" @click="exportData">导出</el-button>
-          <!-- 点击批量发货按钮，调用 dispatchGoods 方法 -->
-          <el-button type="primary" @click="dispatchGoods">批量发货</el-button>
+
           <!-- 点击下载批量发货样单按钮，调用 exportDispatchGoods 方法 -->
           <el-button type="primary" @click="exportDispatchGoods">下载批量发货样单</el-button>
         </el-container>
@@ -295,7 +281,6 @@ const callUser = (item) => {
           <!-- 来源列，显示订单来源 -->
           <el-table-column label="来源" width="300" prop="source" />
         </el-table>
-        
       </div>
     </div>
   </div>
