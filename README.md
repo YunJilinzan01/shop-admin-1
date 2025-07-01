@@ -1,35 +1,9 @@
-# Test
+下载依赖 npm install
 
-This template should help get you started developing with Vue 3 in Vite.
+运行代码 npm run dev
 
-## Recommended IDE Setup
+打包代码 npm run build
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+本项目仅供参考学习，禁止商用
 
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
-
-```sh
-npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
-npm run dev
-```
-
-### Compile and Minify for Production
-
-```sh
-npm run build
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```
+账号adimn 密码000000
