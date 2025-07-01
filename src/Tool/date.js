@@ -1,0 +1,9 @@
+// filepath: c:\Users\32317\Desktop\shop-admin-1\src\components\goods\OrderPage.vue
+export default function formatDate(date) {
+  if (!date) return ''
+  const d = new Date(date)
+  const year = d.getFullYear()
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
