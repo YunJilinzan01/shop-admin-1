@@ -1,80 +1,83 @@
 <script setup>
 // 引入模拟数据模块，用于生成假订单数据
-import Mock from '@/mock/Mock'
+import { requestGoodsList } from '@/api/request'
 // 引入工具方法模块，包含导出等功能
 // 引入 Element Plus 的消息提示组件
 import { ElMessage } from 'element-plus'
 // 引入 Vue 的响应式和生命周期相关方法
-import { computed, onMounted, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 // 引入 vue-router 的路由相关方法
-import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
 const router = useRouter()
 // 组件挂载时，获取订单数据
-onMounted(() => {
-  goodsData.value = Mock.getGoods(route.query.type)
-})
-
-// 路由参数变化时，重新获取订单数据
-onBeforeRouteUpdate((to) => {
-  goodsData.value = Mock.getGoods(to.query.type)
+onMounted(async () => {
+  const res = await requestGoodsListData()
+  console.log(res)
+  if (res.data.code === 200 && res.data.data) {
+    goodsData.value = res.data.data
+    ElMessage({
+      type: 'success',
+      message: `获取成功${res.data.data.length}条`,
+    })
+    return
+  }
+  ElMessage({
+    type: 'error',
+    message: `获取失败`,
+  })
 })
 
 const goodsData = ref([])
-const categories = ref(['全部', '男装', '女装'])
 
 const queryParams = ref({
-  name: '',
+  goodsName: '',
   id: '',
-  category: '',
-  sellMode: 2,
-  expMode: 2,
+  operate: '',
 })
 
-const sellModeString = computed({
-  get() {
-    if (queryParams.value.sellMode === 2) {
-      return '全部'
-    }
-    return queryParams.value.sellMode === 0 ? '否' : '是'
-  },
-  set(val) {
-    queryParams.value.sellMode = val
-  },
-})
-const expModeString = computed({
-  get() {
-    if (queryParams.value.expMode === 2) {
-      return '全部'
-    }
-    return queryParams.value.expMode === 0 ? '否' : '是'
-  },
-  set(val) {
-    queryParams.value.expMode = val
-  },
-})
+const requestData = async () => {
+  const res = await requestGoodsListData(
+    queryParams.value.goodsName,
+    queryParams.value.id,
+    queryParams.value.operate,
+  )
+  if (res.data.code === 200 && res.data.data) {
+    ElMessage({
+      type: 'success',
+      message: '筛选请求参数',
+    })
+    goodsData.value = res.data.data
+    console.log(goodsData.value)
 
-const requestData = () => {
-  ElMessage({
-    type: 'success',
-    message: '筛选请求参数',
-  })
-  goodsData.value = Mock.getGoods(route.query.type)
-}
-const operate = (item) => {
-  item.state = !item.state
-}
-
-const clear = () => {
-  queryParams.value = {
-    name: '',
-    id: '',
-    category: '',
-    sellMode: 2,
-    expMode: 2,
+    return
   }
-  goodsData.value = Mock.getGoods(route.query.type)
+  ElMessage({
+    type: 'error',
+    message: '筛选请求参数失败',
+  })
+}
+
+const clear = async () => {
+  const res = await requestGoodsListData()
+  if (res.data.code === 200 && res.data.data) {
+    ElMessage({
+      type: 'success',
+      message: '显示成功',
+    })
+    queryParams.value = {
+      name: '',
+      id: '',
+      operate: '',
+    }
+    goodsData.value = res.data.data
+    return
+  }
+  ElMessage({
+    type: 'error',
+    message: '清除失败',
+  })
 }
 const addGoods = () => [
   router.push({
@@ -84,6 +87,22 @@ const addGoods = () => [
     },
   }),
 ]
+
+const requestGoodsListData = async (name, id, operate) => {
+  return await requestGoodsList(name, id, operate)
+}
+const toggleOperate = async (row) => {
+  // 假设有一个更新接口 updateGoodsOperate
+  const newOperate = row.operate === 1 ? 0 : 1
+  try {
+    // 这里调用后端接口更新状态（你需要实现该接口）
+    await requestGoodsList(row.goodsName, row.id, newOperate)
+    row.operate = newOperate // 前端先行切换
+    ElMessage.success(`已${newOperate === 1 ? '上架' : '下架'}`)
+  } catch (e) {
+    ElMessage.error('操作失败', e)
+  }
+}
 </script>
 <template>
   <div class="content-container" direction="vertical">
@@ -92,34 +111,18 @@ const addGoods = () => [
       <el-container class="content-row" style="display: flex; align-items: center">
         <div class="input-tip">商品名称:</div>
         <div class="input-field">
-          <el-input v-model="queryParams.name" />
+          <el-input v-model="queryParams.goodsName" />
         </div>
         <div class="input-tip">商品编号:</div>
         <div class="input-field">
           <el-input v-model="queryParams.id" />
         </div>
-        <div class="input-tip">商品分类:</div>
-        <div class="input-field">
-          <el-select v-model="queryParams.category" placeholder="请选择分类" style="width: 240px">
-            <el-option v-for="item in categories" :key="item.id" :label="item" :value="item" />
-          </el-select>
-        </div>
-      </el-container>
-      <el-container class="content-row" style="display: flex; align-items: center">
         <div class="input-tip">是否上架</div>
         <div class="input-field">
-          <el-select style="width: 240px" v-model="sellModeString">
+          <el-select style="width: 240px" v-model="queryParams.operate">
             <el-option label="否" :value="0" key="0" />
             <el-option label="是" :value="1" key="1" />
-            <el-option label="全部" :value="2" key="2" />
-          </el-select>
-        </div>
-        <div class="input-tip">是否过期：</div>
-        <div class="input-field">
-          <el-select style="width: 240px" v-model="expModeString">
-            <el-option label="否" :value="0" key="0" />
-            <el-option label="是" :value="1" key="1" />
-            <el-option label="全部" :value="2" key="2" />
+            <el-option label="全部" :value="''" key="2" />
           </el-select>
         </div>
       </el-container>
@@ -138,24 +141,26 @@ const addGoods = () => [
         <el-table-column label="商品" width="100">
           <template #default="scope">
             <div style="text-align: center">
-              <el-image style="width: 60px; height: 100px" :src="scope.row.img" />
-              <div style="text-align: center">{{ scope.row.name }}</div>
+              <el-image style="width: 60px; height: 100px" :src="scope.row.goodsImage" />
+              <div style="text-align: center">{{ scope.row.goodsName }}</div>
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="价格" width="180" prop="price" />
-        <el-table-column label="销量" prop="sellCount" width="100" />
-        <el-table-column label="库存" width="180" prop="count" />
-        <el-table-column label="退款数量" width="180" prop="back" />
-        <el-table-column label="退款金额" prop="backPirce" />
-        <el-table-column label="操作" width="100" prop="name">
+        <el-table-column label="价格" width="180" prop="goodsPrice" />
+        <el-table-column label="销量" prop="goodsSales" width="100" />
+        <el-table-column label="库存" width="180" prop="inventory" />
+        <el-table-column label="退款数量" width="180" prop="refundCount" />
+        <el-table-column label="退款金额" prop="refundPrice" />
+        <el-table-column label="操作" width="100" prop="operate">
           <template #default="scope">
-            <el-button @click="operate(scope.row)" :type="scope.row.state ? 'danger' : 'success'">{{
-              scope.row.state ? '下架' : '上架'
-            }}</el-button>
+            <el-button
+              @click="toggleOperate(scope.row)"
+              :type="scope.row.operate ? 'danger' : 'success'"
+              >{{ scope.row.operate ? '下架' : '上架' }}</el-button
+            >
           </template>
         </el-table-column>
-        <el-table-column label="管理员" width="100" prop="owner" />
+        <el-table-column label="管理员" width="100" prop="admin" />
         <el-table-column label="更新时间" width="200" prop="time" />
       </el-table>
     </div>
