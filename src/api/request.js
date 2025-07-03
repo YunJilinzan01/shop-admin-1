@@ -38,10 +38,15 @@ export const delOrderItem = async (index) => {
 }
 
 // 获取商品详情
-export const requestGoodsList = async () => {
+export const requestGoodsList = async (goodsName = '', id = '', operate = '') => {
   return await request.request({
-    url: '/api/goods',
+    url: '/goods',
     method: 'GET',
+    params: {
+      goodsName,
+      id,
+      operate,
+    },
   })
 }
 
