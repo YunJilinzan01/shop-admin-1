@@ -1,4 +1,4 @@
-// filepath: c:\Users\32317\Desktop\shop-admin-1\src\components\goods\OrderPage.vue
+
 export default function formatDate(date) {
   if (!date) return ''
   const d = new Date(date)

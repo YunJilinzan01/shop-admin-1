@@ -98,7 +98,7 @@ const toggleOperate = async (row) => {
     // 这里调用后端接口更新状态（你需要实现该接口）
     await requestGoodsList(row.goodsName, row.id, newOperate)
     row.operate = newOperate // 前端先行切换
-    ElMessage.success(`已${newOperate === 1 ? '上架' : '下架'}`)
+    ElMessage.success(`已${newOperate === 1 ? '下架' : '上架'}`)
   } catch (e) {
     ElMessage.error('操作失败', e)
   }
@@ -138,19 +138,19 @@ const toggleOperate = async (row) => {
     <!-- list -->
     <div>
       <el-table :data="goodsData" style="width: 100%" tooltip-effect="dark">
-        <el-table-column label="商品" width="100">
+        <el-table-column label="商品" width="100" header-align="center">
           <template #default="scope">
             <div style="text-align: center">
-              <el-image style="width: 60px; height: 100px" :src="scope.row.goodsImage" />
+              <el-image style="width: 100px; height: 100px" :src="scope.row.goodsImage" />
               <div style="text-align: center">{{ scope.row.goodsName }}</div>
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="价格" width="180" prop="goodsPrice" />
-        <el-table-column label="销量" prop="goodsSales" width="100" />
-        <el-table-column label="库存" width="180" prop="inventory" />
-        <el-table-column label="退款数量" width="180" prop="refundCount" />
-        <el-table-column label="退款金额" prop="refundPrice" />
+        <el-table-column label="价格" width="180" prop="goodsPrice"  header-align="center" align="center" />
+        <el-table-column label="销量" prop="goodsSales" width="100" header-align="center" align="center" />
+        <el-table-column label="库存" width="180" prop="inventory" header-align="center" align="center" />
+        <el-table-column label="退款数量" width="180" prop="refundCount" header-align="center" align="center" />
+        <el-table-column label="退款金额" prop="refundPrice" header-align="center" align="center" />
         <el-table-column label="操作" width="100" prop="operate">
           <template #default="scope">
             <el-button
