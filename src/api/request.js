@@ -51,27 +51,30 @@ export const requestGoodsList = async (goodsName = '', id = '', operate = '') =>
 }
 
 // 获取商品设置
-export const requestGoodsBaseSetting = async (
-  goodsName,
-  goodsPirce,
-  goodsImage,
-  goodsListImage,
-  goodsTime,
-  goodsClassify,
-) => {
+export const requestGoodsBaseSetting = async (formData) => {
   return await request.request({
-    url: '/api/update',
+    url: '/upload-chunk',
     method: 'POST',
-    data: {
-      goodsName,
-      goodsPirce,
-      goodsImage,
-      goodsListImage,
-      goodsTime,
-      goodsClassify,
+    data: formData,
+    headers: {
+      'Content-Type': 'multipart/form-data',
     },
   })
 }
+
+
+// 合并分片接口
+export const merge = async (data) => {
+  return await request.request({
+    url: '/merge-chunks',
+    method: 'POST',
+    data, // 直接传对象，request库会自动转为json
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+}
+
 
 // 获取商品分类
 export const requestGoodsClassify = async () => {
